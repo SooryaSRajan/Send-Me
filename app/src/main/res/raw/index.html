@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="bootstrap.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <title>Send Me</title>
+
+
+        <style>
+    .jumbotron {
+      background-image: url("background.jpg");
+      color: #fff;
+    }
+
+    .image_background {
+      background-image: url("background.jpg");
+      width: 100%;
+      height: 40%;
+      background-color: aqua;
+    }
+
+    body {
+      background: rgb(51, 65, 88);
+      margin: 0%;
+      font-family: sans-serif;
+    }
+
+    #myProgress {
+      width: 100%;
+      background-color: #ddd;
+    }
+
+    #myBar {
+      width: 1%;
+      height: 30px;
+      background-color: #4CAF50;
+    }
+
+    .title_icon {
+      color: rgb(62, 139, 255);
+      margin-right: 10px;
+    }
+
+    .ul_nav {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: rgba(65, 65, 65, 0.541);
+    }
+
+    .li_bar {
+      float: left;
+    }
+
+    .li_bar_title {
+      font-weight: bold;
+    }
+
+    .li_bar a {
+      margin: 0;
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    .li_bar a:hover {
+      background-color: #111;
+    }
+
+    .justify-content-center {
+      padding: 10px;
+      background-color: white;
+      border-radius: 10px;
+      margin-left: 40px;
+      margin-right: 40px;
+      margin-bottom: 10px;
+    }
+
+    hr.dashed {
+      border-top: 3px dashed #bbb;
+    }
+
+    .file_name_responsive {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .file_upload_responsive {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+    }
+
+    @media screen and (max-width: 650px) {
+
+      .table_responsive {
+        visibility: collapse;
+        display: none;
+      }
+
+      .justify-content-center {
+        margin: 3px;
+        padding: 2px;
+      }
+
+      table th .file_name_responsive .table-striped {
+        width: 20px;
+        table-layout: fixed;
+      }
+
+      .file_name_responsive {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+      }
+
+    }
+
+    @media screen and (max-width: 300px) {
+
+      .reload-responsive {
+        visibility: collapse;
+        display: none;
+      }
+
+
+      .file_name_responsive {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70px;
+      }
+
+    }
+
+  </style>
+    </head>
+
+    <body onload='getListData()'>
+
+        <div class="image_background">
+
+            <ul class="ul_nav">
+                <li class="li_bar li_bar_title"><a class="active" href="#"><i class="fa fa-share title_icon"></i>Share Me</a></li>
+                <li class="li_bar"><a href="#">About us</a></li>
+
+            </ul>
+        </div>
+
+
+        <div class="jumbotron text-center jumbotron-fluid">
+            <h1 class="display-4">Share Me!</h1>
+            <p>Share all your files with ease!</p>
+        </div>
+
+        <div class="justify-content-center">
+            <div class="input-group">
+                <input type="search" class="form-control rounded" placeholder="Search.." aria-label="Search"
+                        aria-describedby="search-addon" />
+                <button type="button" class="btn btn-outline-primary">search</button>
+            </div>
+        </div>
+
+        <div class="justify-content-center">
+            <table class="table table-striped" id="data-table">
+                <thead>
+                    <tr>
+                        <th class="file_name_responsive">Filename</th>
+                        <th class='table_responsive'>Date</th>
+                        <th class='table_responsive'>Size</th>
+                        <th>Download</th>
+                        <th class='reload-responsive'><Button class="btn btn-primary" onclick='getListData()'><i
+                                class="fa fa-refresh"></i></Button></th>
+                    </tr>
+                </thead>
+            </table>
+            <p id="no_content">No content available to download</p>
+        </div>
+
+
+        <div class="justify-content-center">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Send Files</th>
+                        <th>
+                            <form id="upload-form" name="form" method="post" enctype="multipart/form-data">
+                                <input id="input-upload" name="file" type="file" class="btn btn-outline-primary file_upload_responsive">
+                                <button onclick="submitFile()" type="button" class="btn btn-outline-primary">upload</button>
+                            </form>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="upload-bar">
+                    <tr>
+                        <th>
+                            Upload Progress
+                        </th>
+                        <th>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped active" id="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+    function submitFile() {
+
+      var name = document.getElementById('input-upload');
+      console.log('Selected file: ' + name.files.item(0).name);
+      console.log('Selected file: ' + name.files.item(0).size);
+      console.log('Selected file: ' + name.files.item(0).type);
+
+      console.log('Sent');
+      var url = "/file*" + name.files.item(0).name;
+      var formData = new FormData($('#upload_form')[0]);
+      formData.append('file', $('input[type=file]')[0].files[0]);
+      var xhr = new XMLHttpRequest();
+      xhr.upload.onprogress = function(evt){
+        var prog = evt.loaded/evt.total*100;
+        console.log('progress', prog)
+        updateProgress(prog)} ;
+      xhr.open('POST', url, true);
+      xhr.send(formData);
+      return false;
+    }
+  </script>
+
+
+
+        <script>
+    function addData(nameVar, dateVar, sizeVar) {
+      var table = document.getElementById("data-table");
+      console.log(document.getElementById("no_content").textContent)
+      if (document.getElementById('no_content').textContent == 'No content available to download') {
+        document.getElementById('no_content').innerHTML = '';
+      }
+      var row = table.insertRow(1);
+      var fileName = row.insertCell(0);
+      var date = row.insertCell(1);
+      var size = row.insertCell(2);
+      var download = row.insertCell(3);
+      var reload = row.insertCell(4);
+      fileName.innerHTML = nameVar;
+      date.innerHTML = dateVar;
+      size.innerHTML = sizeVar;
+
+
+      date.className = 'table_responsive';
+      size.className = 'table_responsive';
+      fileName.className = 'file_name_responsive';
+      var urlDownload = "<a href='BUTTON_KEY'><i class='fa fa-download title_icon'></i></a>";
+      urlDownload = urlDownload.replace("BUTTON_KEY", nameVar);
+      console.log("URL: " + urlDownload)
+      download.innerHTML = urlDownload;
+    }
+  </script>
+
+
+
+    </body>
+
+
+    <script type="application/javascript">
+  var key = 0;
+  function getListData() {
+    var url = "/list_data"
+    var httpRequest = new XMLHttpRequest();
+    console.log("requesting list")
+    httpRequest.onreadystatechange = function () {
+      if (httpRequest.readyState == 4) {
+        console.log(httpRequest.responseText)
+        var json = JSON.parse(httpRequest.responseText)
+        console.log("key" + json[0]['KEY'])
+
+        if (parseInt(json[0]['KEY']) != parseInt(key)) {
+          clearTable()
+          for (i = 1; i < json.length; i++) {
+            console.log(json[i] + "asdasd")
+
+            addData(json[i]["NAME"], json[i]["DATE"], json[i]["SIZE"])
+          }
+          key = parseInt(json[0]['KEY']);
+
+        }
+
+      }
+    }
+
+    httpRequest.open("POST", url, true);
+    httpRequest.send();
+  }
+
+  function clearTable() {
+    var table = document.getElementById("data-table");
+
+    console.log("cleared" + table.rows.length)
+    for (i = table.rows.length - 1; i > 0; i--) {
+      table.deleteRow(i)
+    }
+  }
+
+  function updateProgress(progress){
+    document.getElementById("progress-bar").style.width = progress + "%";
+  }
+
+</script>
+
+
+    <script>
+  setInterval(getListData, 20000)
+</script>
+
+</html>
